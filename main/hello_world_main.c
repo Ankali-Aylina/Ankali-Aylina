@@ -18,6 +18,15 @@
 
 static const char *TAG = "MAIN APP";
 
+//任务函数
+static void test_task_example(void* arg)
+{
+    for(;;) {
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        printf("task run \n");
+    }
+}
+
 void app_main(void)
 {
     printf("Hello world!\n");
@@ -39,6 +48,8 @@ void app_main(void)
     printf("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size()); //可用的最小可用堆
 
     ESP_LOGI(TAG, "system init V1.1");
+
+    xTaskCreate(test_task_example, "test_task_example", 2048, NULL, 10, NULL);  //任务创建 （任务函数名 任务名 任务堆栈大小 任务参数 任务优先度 已创建任务）
 
     while(1){
         printf("system run ...\n");
