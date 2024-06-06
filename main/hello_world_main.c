@@ -14,22 +14,9 @@
 #include "esp_spi_flash.h"
 #include "esp_log.h"
 
-#include "ds_timer.h"
-#include "ds_spiffs.h"
-#include "ds_system_data.h"
-#include "ds_nvs.h"
-
 #define CHIP_NAME "ESP32"
 
 static const char *TAG = "MAIN APP";
-
-static void test_task_example(void* arg)
-{
-    for(;;) {
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-        printf("task run \n");
-    }
-}
 
 void app_main(void)
 {
@@ -52,21 +39,6 @@ void app_main(void)
     printf("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
     ESP_LOGI(TAG, "system init V1.1");
-
-    ds_timer_init();
-
-    init_spiffs();
-    ds_spiffs_test();
-    ds_spiffs_deinit();
-
-    char *ssid="leo";
-    char *psw="123456789";
-    set_system_data_wifi_info(ssid,strlen(ssid),psw,strlen(psw));
-    ds_nvs_init();
-    ds_nvs_save_wifi_info();
-    ds_nvs_read_wifi_info();
-
-    xTaskCreate(test_task_example, "test_task_example", 2048, NULL, 10, NULL);
 
     while(1){
         printf("system run ...\n");
