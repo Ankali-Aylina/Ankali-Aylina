@@ -14,11 +14,12 @@
 #include "esp_spi_flash.h"
 #include "esp_log.h"
 
+#include "ds_timer.h"
+
 #define CHIP_NAME "ESP32"
 
 static const char *TAG = "MAIN APP";
 
-//任务函数
 static void test_task_example(void* arg)
 {
     for(;;) {
@@ -31,25 +32,27 @@ void app_main(void)
 {
     printf("Hello world!\n");
 
-    /* 打印芯片信息 */
-    esp_chip_info_t chip_info;  //芯片信息结构体
+    /* Print chip information */
+    esp_chip_info_t chip_info;
     esp_chip_info(&chip_info);
     printf("This is %s chip with %d CPU core(s), WiFi%s%s, ",
             CHIP_NAME,
-            chip_info.cores,    //CPU核数
-            (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",    //CHIP_FEATURE_X功能标志的位掩码  芯片拥有蓝牙经典
-            (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : ""); //CHIP_FEATURE_X功能标志的位掩码  芯片具有蓝牙LE
+            chip_info.cores,
+            (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
+            (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
 
-    printf("silicon revision %d, ", chip_info.revision);    //芯片修订版号
+    printf("silicon revision %d, ", chip_info.revision);
 
     printf("%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
-            (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");   //CHIP_FEATURE_X功能标志的位掩码  芯片具有嵌入式闪存
+            (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
 
-    printf("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size()); //可用的最小可用堆
+    printf("Minimum free heap size: %d bytes\n", esp_get_minimum_free_heap_size());
 
     ESP_LOGI(TAG, "system init V1.1");
 
-    xTaskCreate(test_task_example, "test_task_example", 2048, NULL, 10, NULL);  //任务创建 （任务函数名 任务名 任务堆栈大小 任务参数 任务优先度 已创建任务）
+    ds_timer_init();    //定时器初始化
+
+    xTaskCreate(test_task_example, "test_task_example", 2048, NULL, 10, NULL);
 
     while(1){
         printf("system run ...\n");
